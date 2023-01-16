@@ -1,10 +1,5 @@
 use std::collections::{hash_map::Entry, HashMap};
-
-use axum::{extract::Path, Json};
 use chrono::Local;
-
-use crate::errors::AppError;
-
 use rand::prelude::*;
 use rand_seeder::Seeder;
 use rand_pcg::Pcg64;
@@ -71,7 +66,7 @@ pub struct CollectiveInformation {
 }
 
 // unsure yet how to store that
-pub(crate) async fn get_tasks_for_member() -> Result<(), AppError> {
+pub(crate) async fn get_tasks_for_member() {
     let data = get_colletive_information();
 
     println!("{data:?}");
@@ -89,8 +84,6 @@ pub(crate) async fn get_tasks_for_member() -> Result<(), AppError> {
         println!("{}", rng.gen::<u16>());
         println!("{}", rng.gen_range(0..4));
     });
-
-    Ok(())
 }
 
 fn get_colletive_information() -> CollectiveInformation {
