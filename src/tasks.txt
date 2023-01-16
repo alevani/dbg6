@@ -1,11 +1,11 @@
 Bathroom:	
-	Clean mirror
-	Clean sink + tap
-	Clean shower + shower head + fittings
-	Empty trash bin
-	Wipe all surfaces
-	Vacuum floor + wash
-	Clean toilet
+	(1)	Clean mirror
+	(1)	Clean sink + tap
+	(1)	Clean shower + shower head + fittings
+	(2) Empty trash bin
+	(1)	Wipe all surfaces
+	(4)	Vacuum floor + wash
+	(1)	Clean toilet
 Kitchen:	
 	Descale and clean Kettle 
 	Clean Toaster
@@ -13,23 +13,22 @@ Kitchen:
 	Clean Sink
 	Clean micro
 	Clean Common shelves in fridge (throw out stuff that is too old)
-	Empty Trash + Bio Trash + clean bio bin
-	Empty Recycling + clean bins
-	Clean under sink
+	(2) Empty Trash + Bio Trash + clean bio bin
+	(2) Empty Recycling + clean bins
+	(2) Clean under sink
 	Clean the 3 vases (cloths and dish brush + onion + pot spoon, palette knife ect)
-	Wipe all surfaces + panels (kitchen counter area)
-	Wipe all surfaces + panels (table area)
-	Boil water for cutting boards
-	Vacuum floor + wash 
+	(3) Wipe all surfaces + panels (kitchen counter area)
+	(3) Wipe all surfaces + panels (table area)
+	(4) Vacuum floor + wash 
 	
 Living Room + entrance:	
 	Wipe all surfaces Living room (incl. panels)
-	Vacuum sofa and chair
-	Vacuum floor + wash 
+	(4) Vacuum sofa and chair
+	(4) Vacuum floor + wash 
 	Clean shoe rack, wipe surfaces hall way (incl. panels)
 	
 Other	
 	Wash towels + Cloths (90 degrees)
-	Refund bottles and cans
-	Shopping (have a look + shoppinglist)
+	(5) Refund bottles and cans
+	(5) Shopping (have a look + shoppinglist)
 	Water plants in common areas
