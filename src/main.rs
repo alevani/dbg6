@@ -15,6 +15,7 @@ struct AppState {
 
 pub mod api;
 pub mod errors;
+pub mod dbgg_resources;
 
 #[tokio::main]
 async fn main() {
@@ -33,8 +34,6 @@ async fn main() {
         envs,
         http_client: reqwest_client,
     };
-
-    
 
     // build our application with a route
     let app = Router::new()
