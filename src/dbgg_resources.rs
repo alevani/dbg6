@@ -94,13 +94,13 @@ pub fn get_tasks_for_member() {
             current_tasks_difficulty += task.difficulty;
             member_current_task.push(task);
     
-            
             if task.group != Group::Other {
                 // fetch all the tasks that belong to that group
-                data.tasks.iter().enumerate().filter(|(_, x)| x.group == task.group).for_each(|(i, t)| {
+                data.tasks.iter().enumerate().filter(|(i, x)| x.group == task.group && i != &(index as usize)).for_each(|(i, t)| {
                     current_tasks_difficulty += t.difficulty;
                     used_task.insert(i as i32);
                     member_current_task.push(t);
+                    println!("{current_tasks_difficulty:?}");
                 });
             }
         }
@@ -153,6 +153,8 @@ fn get_colletive_information() -> CollectiveInformation {
 
     let members = get_members();
     let num_members = members.len() as i32;
+
+    println!("{:?}", tasks.iter().map(|a| a.difficulty).collect::<Vec<_>>());
 
     CollectiveInformation {
         tasks,
