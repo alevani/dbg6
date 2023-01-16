@@ -83,26 +83,25 @@ pub fn get_tasks_for_member() {
         let mut index = rng.gen_range(0..data.number_of_task);
         let mut current_tasks_difficulty = 0;
         let mut member_current_task: Vec<&Task> = Vec::new();
+        let mut task: &Task;
         
         println!("----{}---", member.name);
         while current_tasks_difficulty < data.max_complexity_per_member {
-            while let Some(_) = used_task.get(&index) {
+            loop {
+                
+                task = data.tasks.get(index as usize).unwrap();
+                if !used_task.contains(&index) /*&& (current_tasks_difficulty + task.difficulty) <= data.max_complexity_per_member */{
+                    break;
+                }
+                
                 index = rng.gen_range(0..data.number_of_task);
             }
+            println!("{task:?}");
+            
             used_task.insert(index);
             let task = data.tasks.get(index as usize).unwrap();
             current_tasks_difficulty += task.difficulty;
             member_current_task.push(task);
-    
-            if task.group != Group::Other {
-                // fetch all the tasks that belong to that group
-                data.tasks.iter().enumerate().filter(|(i, x)| x.group == task.group && i != &(index as usize)).for_each(|(i, t)| {
-                    current_tasks_difficulty += t.difficulty;
-                    used_task.insert(i as i32);
-                    member_current_task.push(t);
-                    println!("{current_tasks_difficulty:?}");
-                });
-            }
         }
         println!("{member_current_task:?}");
         println!("{current_tasks_difficulty:?}");
@@ -167,12 +166,6 @@ fn get_colletive_information() -> CollectiveInformation {
     let target = 20;
     let n = 3;
 
-    let subsets = generate_subsets(n, target, &arr);
-
-    for (i, subset) in subsets.iter().enumerate() {
-        println!("Subset {}: {:?}", i + 1, subset);
-    }
-
     // todo, for simplicity, the number should be dividable by 2, 3, 4. 
     // todo. For instance, 48 is a perfect candidate: 12, 16, 24
 
@@ -187,40 +180,11 @@ fn get_colletive_information() -> CollectiveInformation {
 }
 
 /*
-
 What algorithm can solve the following problem: 
 Generate a function that randomly generate N subset of the following array
 [9, 8, 9, 5, 3, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1]
 each subset's sum needs to be as close as possible to X
 Each element of the array should only be used once
 Assume know that N divides X without remainder. That means that each subset is a perfect sum to X
-
 The function should return a vector containing the N subset
 */
-fn generate_subsets(n: usize, target: i32, arr: &[i32]) -> Vec<Vec<&'static i32>> {
-    let mut rng = rand::thread_rng();
-    let mut subsets = vec![];
-
-    for _ in 0..n {
-        let mut subset = vec![];
-        let mut sum = 0;
-        let mut remaining = arr.to_vec();
-        remaining.shuffle(&mut rng);
-
-        for x in remaining.iter().clone() {
-            if sum + x <= target {
-                subset.push(x);
-                sum += x;
-                remaining.retain(|&y| &y != x);
-            }
-
-            if sum >= target {
-                break;
-            }
-        }
-
-        subsets.push(subset);
-    }
-
-    subsets
-}
