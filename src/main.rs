@@ -1,6 +1,6 @@
-use api::example;
 use axum::{routing::get, Router};
 use axum_macros::FromRef;
+use dbgg_resources::get_members;
 
 use std::net::SocketAddr;
 
@@ -13,7 +13,6 @@ struct AppState {
     envs: Envs,
 }
 
-pub mod api;
 pub mod errors;
 pub mod dbgg_resources;
 
@@ -21,26 +20,11 @@ pub mod dbgg_resources;
 async fn main() {
     dotenv::dotenv().ok();
 
-    // Retrive all necessary environment variables
-    let envs = Envs {};
-
-    let reqwest_client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(5))
-        .connection_verbose(true)
-        .build()
-        .expect("Could not create reqwest client");
-
-    let states = AppState {
-        envs,
-        http_client: reqwest_client,
-    };
-
     // build our application with a route
     let app = Router::new()
         .route("/", get(ping))
-        .route("/example", get(example))
-        .with_state(states);
-
+        .route("/members", get(get_members));
+    
     // run our app with hyper
     // `axum::Server` is a re-export of `hyper::Server`
     let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
