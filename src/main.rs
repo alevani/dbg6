@@ -1,6 +1,6 @@
 use axum::{routing::get, Router};
 use axum_macros::FromRef;
-use dbgg_resources::get_members;
+use dbgg_resources::get_members as members;
 
 use std::net::SocketAddr;
 
@@ -13,8 +13,8 @@ struct AppState {
     envs: Envs,
 }
 
-pub mod errors;
 pub mod dbgg_resources;
+pub mod errors;
 
 #[tokio::main]
 async fn main() {
@@ -23,8 +23,9 @@ async fn main() {
     // build our application with a route
     let app = Router::new()
         .route("/", get(ping))
-        .route("/members", get(get_members));
-    
+        .route("/members", get(members))
+        .route("/tasks/:member", get(task));
+
     // run our app with hyper
     // `axum::Server` is a re-export of `hyper::Server`
     let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
