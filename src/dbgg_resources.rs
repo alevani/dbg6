@@ -173,6 +173,9 @@ fn get_colletive_information() -> CollectiveInformation {
         println!("Subset {}: {:?}", i + 1, subset);
     }
 
+    // todo, for simplicity, the number should be dividable by 2, 3, 4. 
+    // todo. For instance, 48 is a perfect candidate: 12, 16, 24
+
     CollectiveInformation {
         tasks,
         number_of_task,
@@ -182,33 +185,6 @@ fn get_colletive_information() -> CollectiveInformation {
         max_complexity_per_member: total_complexity / num_members,
     }
 }
-
-
-// ChatGPT Generated
-// Since the list of tasks and their weight won't change
-// we don't need to go full subset sum. A stupid brutforce will do
-fn separate_into_slices(numbers: &[i32], x: i32) -> Vec<&[i32]> {
-    let mut result = vec![];
-    let mut current_sum = 0;
-    let mut current_slice_start = 0;
-    let mut current_slice_end;
-
-    for (i, &num) in numbers.iter().enumerate() {
-        current_sum += num;
-        current_slice_end = i;
-
-        if current_sum >= x {
-            result.push(&numbers[current_slice_start..=current_slice_end]);
-            current_slice_start = i + 1;
-            current_sum = 0;
-        }
-    }
-    if current_slice_start < numbers.len() {
-        result.push(&numbers[current_slice_start..numbers.len()]);
-    }
-    result
-}
-
 
 /*
 
