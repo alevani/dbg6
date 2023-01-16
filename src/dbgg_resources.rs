@@ -1,8 +1,13 @@
 use std::collections::{hash_map::Entry, HashMap};
 
 use axum::{extract::Path, Json};
+use chrono::Local;
 
 use crate::errors::AppError;
+
+use rand::prelude::*;
+use rand_seeder::Seeder;
+use rand_pcg::Pcg64;
 
 #[derive(Debug)]
 pub struct Member {
@@ -35,9 +40,22 @@ pub enum Area {
 }
 
 #[derive(Debug)]
+pub enum Group {
+    Bathroom,
+    Trashs,
+    WipeKitchen,
+    Vacuum,
+    Outdoor,
+    Other,
+}
+
+#[derive(Debug)]
 pub struct Task {
     pub area: Area,
     pub name: &'static str,
+
+    // If you get a task from a group, it makes sense you get all of that same group
+    pub group: Group
 }
 
 #[derive(Debug)]
@@ -54,6 +72,21 @@ pub struct CollectiveInformation {
 pub(crate) fn get_tasks_for_member() -> Result<(), AppError> {
     let data = get_colletive_information();
 
+    
+    let date = Local::now().date_naive();
+    let date_string = date.format("%Y/%m/%U").to_string();
+
+    data.members.into_iter().map(|member| {
+        // Generates a custom seed based on
+        // Name - Year/Month/Week
+        // This way, the result will only vary from a week to another,
+        //      for each member.
+        let mut rng: Pcg64 = Seeder::from("stripy zebra").make_rng();
+    })
+
+    
+    println!("{}", rng.gen::<char>());
+
     Ok(())
 }
 
@@ -63,13 +96,13 @@ fn get_colletive_information() -> CollectiveInformation {
     let mut number_of_task = 0;
     let mut total_complexity = 0;
 
-    for (area, name, difficulty) in vec![
-        (Area::Bathroom, "Clean mirror", 1),
-        (Area::Bathroom, "Clean sink + tap", 1),
-        (Area::Bathroom, "Clean shower (Floor - Shower head)", 3),
-        (Area::Bathroom, "Clean toilet", 3),
+    for (area, name, difficulty, group) in vec![
+        (Area::Bathroom, "Clean mirror", 1, Group::Bathroom),
+        (Area::Bathroom, "Clean sink + tap", 1, Group::Bathroom),
+        (Area::Bathroom, "Clean shower (Floor - Shower head)", 3, Group::Bathroom),
+        (Area::Bathroom, "Clean toilet", 3, Group::Bathroom),
     ] {
-        let task = Task { area, name };
+        let task = Task { area, name, group };
         tasks.entry(difficulty).or_default().push(task);
 
         number_of_task += 1;
