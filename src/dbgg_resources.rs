@@ -3,6 +3,7 @@ use chrono::Local;
 use rand::prelude::*;
 use rand_seeder::Seeder;
 use rand_pcg::Pcg64;
+use std::collections::HashSet;
 
 #[derive(Debug)]
 pub struct Member {
@@ -21,11 +22,6 @@ fn get_members() -> Vec<Member> {
         .collect()
 }
 
-// pub(crate) async fn task(Path(member): Path<String>) -> Result<Json<Vec<Member>>, AppError> {
-//     // compute a hash for the current year-month-week+member.name
-//     // then get the N tasks the person will get. it should also take into consideration the complexity
-// }
-
 #[derive(Debug)]
 pub enum Area {
     Kitchen,
@@ -36,7 +32,7 @@ pub enum Area {
     Everywhere,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Group {
     Bathroom,
     Trashs,
@@ -50,6 +46,7 @@ pub enum Group {
 pub struct Task {
     pub area: Area,
     pub name: &'static str,
+    pub difficulty: i32,
 
     // If you get a task from a group, it makes sense you get all of that same group
     pub group: Group
@@ -57,16 +54,16 @@ pub struct Task {
 
 #[derive(Debug)]
 pub struct CollectiveInformation {
-    pub tasks: HashMap<i32, Vec<Task>>,
-    pub number_of_task: i32,
-    pub total_complexity: i32,
+    pub tasks: Vec<Task>,
     pub members: Vec<Member>,
+    pub number_of_task: i32,
     pub num_members: i32,
+    pub total_complexity: i32,
     pub max_complexity_per_member: i32,
 }
 
 // unsure yet how to store that
-pub(crate) async fn get_tasks_for_member() {
+pub fn get_tasks_for_member() {
     let data = get_colletive_information();
 
     println!("{data:?}");
@@ -75,37 +72,63 @@ pub(crate) async fn get_tasks_for_member() {
     let date = Local::now().date_naive();
     let date_string = date.format("%Y/%m/%U").to_string();
 
+    let mut used_task: HashSet<i32> = HashSet::new();
+
     data.members.into_iter().for_each(|member| {
         // Generates a custom seed based on
         // Name - Year/Month/Week
         // This way, the result will only vary from a week to another,
         // for each member.
         let mut rng: Pcg64 = Seeder::from(format!("{}{date_string}", member.name)).make_rng();
-        println!("{}", rng.gen::<u16>());
-        println!("{}", rng.gen_range(0..4));
+        let mut index = rng.gen_range(0..data.number_of_task);
+        let mut current_tasks_difficulty = 0;
+        let mut member_current_task: Vec<&Task> = Vec::new();
+        
+        println!("----{}---", member.name);
+        while current_tasks_difficulty < data.max_complexity_per_member {
+            while let Some(_) = used_task.get(&index) {
+                index = rng.gen_range(0..data.number_of_task);
+            }
+            used_task.insert(index);
+            let task = data.tasks.get(index as usize).unwrap();
+            current_tasks_difficulty += task.difficulty;
+            member_current_task.push(task);
+    
+            
+            if task.group != Group::Other {
+                // fetch all the tasks that belong to that group
+                data.tasks.iter().enumerate().filter(|(_, x)| x.group == task.group).for_each(|(i, t)| {
+                    current_tasks_difficulty += t.difficulty;
+                    used_task.insert(i as i32);
+                    member_current_task.push(t);
+                });
+            }
+        }
+        println!("{member_current_task:?}");
+        println!("{current_tasks_difficulty:?}");
     });
 }
 
 fn get_colletive_information() -> CollectiveInformation {
-    let mut tasks: HashMap<i32, Vec<Task>> = HashMap::new();
+    let mut tasks: Vec<Task> = Vec::new();
     let mut number_of_task = 0;
     let mut total_complexity = 0;
 
     for (area, name, difficulty, group) in vec![
-        (Area::Bathroom, "Clean mirror", 2, Group::Bathroom),
-        (Area::Bathroom, "Clean sink + tap", 2, Group::Bathroom),
-        (Area::Bathroom, "Clean shower (Floor - Shower head)", 3, Group::Bathroom),
+        (Area::Bathroom, "Clean mirror", 1, Group::Bathroom),
+        (Area::Bathroom, "Clean sink + tap", 1, Group::Bathroom),
+        (Area::Bathroom, "Clean shower (Floor - Shower head)", 2, Group::Bathroom),
         (Area::Bathroom, "Wipe all surfaces", 1, Group::Bathroom),
-        (Area::Bathroom, "Clean toilet", 3, Group::Bathroom),
+        (Area::Bathroom, "Clean toilet", 4, Group::Bathroom),
         (Area::Bathroom, "Empty trash bin", 1, Group::Trashs),
-        (Area::Bathroom, "Vacuum floor + wash", 1, Group::Vacuum),
+        (Area::Bathroom, "Vacuum floor + wash", 2, Group::Vacuum),
         (Area::Kitchen, "Descale and clean Kettle ", 1, Group::Other),
         (Area::Kitchen, "Clean Toaster", 1, Group::Other),
         (Area::Kitchen, "Clean Oven + Trays ", 2, Group::Other),
         (Area::Kitchen, "Clean Sink", 1, Group::Other),
         (Area::Kitchen, "Clean micro", 1, Group::Other),
         (Area::Kitchen, "Clean Common shelves in fridge", 2, Group::Other),
-        (Area::Kitchen, "Empty Trash + Bio Trash + clean bio bin", 3, Group::Trashs),
+        (Area::Kitchen, "Empty Trash + Bio Trash + clean bio bin", 4, Group::Trashs),
         (Area::Kitchen, "Empty Recycling + clean bins", 2, Group::Trashs),
         (Area::Kitchen, "Clean under sink", 1, Group::Trashs),
         (Area::Kitchen, "Clean the 3 vases (cloths and dish brush + onion + pot spoon, palette knife ect)", 1, Group::Other),
@@ -121,8 +144,8 @@ fn get_colletive_information() -> CollectiveInformation {
         (Area::Outdoor, "Shopping (have a look + shoppinglist)", 2, Group::Other),
         (Area::Everywhere, "Water plants in common areas", 1, Group::Other),
     ] {
-        let task = Task { area, name, group };
-        tasks.entry(difficulty).or_default().push(task);
+        let task = Task { area, name, group, difficulty };
+        tasks.push(task);
 
         number_of_task += 1;
         total_complexity += difficulty;
@@ -130,7 +153,7 @@ fn get_colletive_information() -> CollectiveInformation {
 
     let members = get_members();
     let num_members = members.len() as i32;
-    
+
     CollectiveInformation {
         tasks,
         number_of_task,
