@@ -115,33 +115,40 @@ fn get_colletive_information() -> CollectiveInformation {
     let mut total_complexity = 0;
 
     for (area, name, difficulty, group) in vec![
-        (Area::Bathroom, "Clean mirror", 1, Group::Bathroom),
-        (Area::Bathroom, "Clean sink + tap", 1, Group::Bathroom),
-        (Area::Bathroom, "Clean shower (Floor - Shower head)", 2, Group::Bathroom),
-        (Area::Bathroom, "Wipe all surfaces", 1, Group::Bathroom),
-        (Area::Bathroom, "Clean toilet", 4, Group::Bathroom),
-        (Area::Bathroom, "Empty trash bin", 1, Group::Trashs),
-        (Area::Bathroom, "Vacuum floor + wash", 2, Group::Vacuum),
+        // (Area::Bathroom, "Clean mirror", 1, Group::Bathroom),
+        // (Area::Bathroom, "Clean sink + tap", 1, Group::Bathroom),
+        // (Area::Bathroom, "Clean shower (Floor - Shower head)", 2, Group::Bathroom),
+        // (Area::Bathroom, "Wipe all surfaces", 1, Group::Bathroom),
+        // (Area::Bathroom, "Clean toilet", 4, Group::Bathroom),
+        (Area::Bathroom, "Clean Bathroom tasks", 9, Group::Bathroom),
+        // (Area::Bathroom, "Empty trash bin", 1, Group::Trashs),
+        // (Area::Kitchen, "Empty Trash + Bio Trash + clean bio bin", 4, Group::Trashs),
+        // (Area::Kitchen, "Empty Recycling + clean bins", 2, Group::Trashs),
+        // (Area::Kitchen, "Clean under sink", 1, Group::Trashs),
+        (Area::Kitchen, "Trash related tasks", 8, Group::Trashs),
+        // (Area::Bathroom, "Vacuum floor + wash", 2, Group::Vacuum),
+        // (Area::Kitchen, "Vacuum floor + wash", 3, Group::Vacuum),
+        // (Area::LivingRoom, "Vacuum sofa and chair", 2, Group::Vacuum),
+        // (Area::LivingRoom, "Vacuum floor + wash", 2, Group::Vacuum),
+        (Area::LivingRoom, "Vacuuming tasks", 9, Group::Vacuum),
+        // (Area::Outdoor, "Refund bottles and cans", 3, Group::Outdoor),
+        // (Area::Outdoor, "Shopping (have a look + shoppinglist)", 2, Group::Outdoor),
+        (Area::Outdoor, "Outdoor tasks", 5, Group::Outdoor),
+        // (Area::Kitchen, "Kitchen counter area: Wipe all surfaces + panels", 2, Group::WipeKitchen),
+        // (Area::Kitchen, "Table area: Wipe all surfaces + panels", 1, Group::WipeKitchen),
+        (Area::Kitchen, "Wipe kitchen tasks", 3, Group::WipeKitchen),
         (Area::Kitchen, "Descale and clean Kettle ", 1, Group::Other),
         (Area::Kitchen, "Clean Toaster", 1, Group::Other),
         (Area::Kitchen, "Clean Oven + Trays ", 2, Group::Other),
         (Area::Kitchen, "Clean Sink", 1, Group::Other),
         (Area::Kitchen, "Clean micro", 1, Group::Other),
         (Area::Kitchen, "Clean Common shelves in fridge", 2, Group::Other),
-        (Area::Kitchen, "Empty Trash + Bio Trash + clean bio bin", 4, Group::Trashs),
-        (Area::Kitchen, "Empty Recycling + clean bins", 2, Group::Trashs),
-        (Area::Kitchen, "Clean under sink", 1, Group::Trashs),
         (Area::Kitchen, "Clean the 3 vases (cloths and dish brush + onion + pot spoon, palette knife ect)", 1, Group::Other),
-        (Area::Kitchen, "Kitchen counter area: Wipe all surfaces + panels", 2, Group::WipeKitchen),
-        (Area::Kitchen, "Table area: Wipe all surfaces + panels", 1, Group::WipeKitchen),
-        (Area::Kitchen, "Vacuum floor + wash", 3, Group::Vacuum),
+        // (Area::Kitchen, "Kitchen counter area: Wipe all surfaces + panels", 2, Group::WipeKitchen),
+        // (Area::Kitchen, "Table area: Wipe all surfaces + panels", 1, Group::WipeKitchen),
         (Area::LivingRoom, "Wipe all surfaces Living room (incl. panels)", 1, Group::Other),
-        (Area::LivingRoom, "Vacuum sofa and chair", 2, Group::Vacuum),
-        (Area::LivingRoom, "Vacuum floor + wash", 2, Group::Vacuum),
         (Area::LivingRoom, "Clean shoe rack, wipe surfaces hall way (incl. panels)", 2, Group::Other),
         (Area::Kitchen, "Wash towels + Cloths (90 degrees)", 1, Group::Other),
-        (Area::Outdoor, "Refund bottles and cans", 3, Group::Other),
-        (Area::Outdoor, "Shopping (have a look + shoppinglist)", 2, Group::Other),
         (Area::Everywhere, "Water plants in common areas", 1, Group::Other),
     ] {
         let task = Task { area, name, group, difficulty };
@@ -155,6 +162,16 @@ fn get_colletive_information() -> CollectiveInformation {
     let num_members = members.len() as i32;
 
     println!("{:?}", tasks.iter().map(|a| a.difficulty).collect::<Vec<_>>());
+
+    let arr = [9, 8, 9, 5, 3, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
+    let target = 20;
+    let n = 3;
+
+    let subsets = generate_subsets(n, target, &arr);
+
+    for (i, subset) in subsets.iter().enumerate() {
+        println!("Subset {}: {:?}", i + 1, subset);
+    }
 
     CollectiveInformation {
         tasks,
@@ -190,4 +207,44 @@ fn separate_into_slices(numbers: &[i32], x: i32) -> Vec<&[i32]> {
         result.push(&numbers[current_slice_start..numbers.len()]);
     }
     result
+}
+
+
+/*
+
+What algorithm can solve the following problem: 
+Generate a function that randomly generate N subset of the following array
+[9, 8, 9, 5, 3, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1]
+each subset's sum needs to be as close as possible to X
+Each element of the array should only be used once
+Assume know that N divides X without remainder. That means that each subset is a perfect sum to X
+
+The function should return a vector containing the N subset
+*/
+fn generate_subsets(n: usize, target: i32, arr: &[i32]) -> Vec<Vec<&'static i32>> {
+    let mut rng = rand::thread_rng();
+    let mut subsets = vec![];
+
+    for _ in 0..n {
+        let mut subset = vec![];
+        let mut sum = 0;
+        let mut remaining = arr.to_vec();
+        remaining.shuffle(&mut rng);
+
+        for x in remaining.iter().clone() {
+            if sum + x <= target {
+                subset.push(x);
+                sum += x;
+                remaining.retain(|&y| &y != x);
+            }
+
+            if sum >= target {
+                break;
+            }
+        }
+
+        subsets.push(subset);
+    }
+
+    subsets
 }
