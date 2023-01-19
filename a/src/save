@@ -1,0 +1,64 @@
+fn main() {
+    let array = [9, 8, 9, 5, 3, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
+    let x = 48;
+    let n = 4;
+    let seed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+
+    
+
+    
+    // Function call
+    Combination(array.to_vec(), 12);
+}
+
+fn unique_combination(l: usize, sum: i32, K: i32, local: &mut Vec<i32>, A: &Vec<i32>) {
+    // If a unique combination is found
+    if sum == K {
+        print!("{{");
+        for i in 0..local.len() {
+            if i != 0 {
+                print!(" ");
+            }
+            print!("{}", local[i]);
+            if i != local.len() - 1 {
+                print!(", ");
+            }
+        }
+        println!("}}");
+        return;
+    }
+
+    // For all other combinations
+    for i in l..A.len() {
+
+        // Check if the sum exceeds K
+        if sum + A[i] > K {
+            continue;
+        }
+
+        // Check if it is repeated or not
+        if i > l && A[i] == A[i - 1] {
+            continue;
+        }
+
+        // Take the element into the combination
+        local.push(A[i]);
+
+        // Recursive call
+        unique_combination(i + 1, sum + A[i], K, local, A);
+
+        // Remove element from the combination
+        local.pop();
+    }
+}
+
+// Function to find all combination of the given elements
+fn Combination(A: Vec<i32>, K: i32) {
+    // Sort the given elements
+    let mut A = A;
+    A.sort();
+
+    let mut local = vec![];
+
+    unique_combination(0, 0, K, &mut local, &A);
+}
