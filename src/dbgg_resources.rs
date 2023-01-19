@@ -62,50 +62,89 @@ pub struct CollectiveInformation {
     pub max_complexity_per_member: i32,
 }
 
-// unsure yet how to store that
-pub fn get_tasks_for_member() {
-    let data = get_colletive_information();
-
-    println!("{data:?}");
+pub fn a() {
+ 
     
-    // todo what if they want to clean on the monday?
-    let date = Local::now().date_naive();
-    let date_string = date.format("%Y/%m/%U").to_string();
-
-    let mut used_task: HashSet<i32> = HashSet::new();
-
-    data.members.into_iter().for_each(|member| {
-        // Generates a custom seed based on
-        // Name - Year/Month/Week
-        // This way, the result will only vary from a week to another,
-        // for each member.
-        let mut rng: Pcg64 = Seeder::from(format!("{}{date_string}", member.name)).make_rng();
-        let mut index = rng.gen_range(0..data.number_of_task);
-        let mut current_tasks_difficulty = 0;
-        let mut member_current_task: Vec<&Task> = Vec::new();
-        let mut task: &Task;
+    /*
+        Since the DP subset like algorithm we use for the
+        division of labor is only dealing with an array of number
+        and has no notion of the link between the numbers and the
+        task it came from, here is how we will go about thing.
         
-        println!("----{}---", member.name);
-        while current_tasks_difficulty < data.max_complexity_per_member {
-            loop {
+        Each week, we calculate the current seed for the RND based
+        on YYYY/MM/WW (if monday, day - 1). 
+        We then shuffle the list of number, and calculate the subsets.
+
+        The one thing that never gets shuffled is the HashMap of tasks
+        T = HashMap<difficulty: i32, Vec<tasks>>.
+    
+        With the new subsets, we can then map each number to an item
+        of the hashmap, just taking the first one in the stack.
+
+        subset1.map(|s| T.remove(s) (<- make sure to remove from stack if occupied))
+
+        Then, we attribute to a random member the subset, still based on the weekly
+        RNG.
+
+        This way, we keep the distribution always random.
+    */
+    
+    let division_of_labor = get_tasks_for_member();
+
+    
+}
+
+// unsure yet how to store that
+pub fn get_tasks_for_member() -> Vec<Vec<i32>> {
+    // While I think about the algorithm, I will assume I receive the correct date
+    vec![vec![9, 2, 1], vec![9, 1, 1, 1], vec![8, 2, 2], vec![3, 5, 1, 1, 1, 1]]
+    
+    // let data = get_colletive_information();
+
+    // println!("{data:?}");
+    
+    // // todo what if they want to clean on the monday?
+    // let date = Local::now().date_naive();
+    // let date_string = date.format("%Y/%m/%U").to_string();
+
+    // let mut used_task: HashSet<i32> = HashSet::new();
+
+    // data.members.into_iter().for_each(|member| {
+    //     // Generates a custom seed based on
+    //     // Name - Year/Month/Week
+    //     // This way, the result will only vary from a week to another,
+    //     // for each member.
+    //     //todo does not need to be a new random gen for each, one per week is enough
+    //     let mut rng: Pcg64 = Seeder::from(format!("{}{date_string}", member.name)).make_rng();
+    //     let mut index = rng.gen_range(0..data.number_of_task);
+    //     let mut current_tasks_difficulty = 0;
+    //     let mut member_current_task: Vec<&Task> = Vec::new();
+    //     let mut task: &Task;
+        
+    //     //? To begin with, you can probably do a simple backtracking.
+    //     //? You add the element, when it doesn't work for someone else, backtrack
+    //     //? though that might be a problem because I use a fixed seed for the generator
+    //     println!("----{}---", member.name);
+    //     while current_tasks_difficulty < data.max_complexity_per_member {
+    //         loop {
                 
-                task = data.tasks.get(index as usize).unwrap();
-                if !used_task.contains(&index) /*&& (current_tasks_difficulty + task.difficulty) <= data.max_complexity_per_member */{
-                    break;
-                }
+    //             task = data.tasks.get(index as usize).unwrap();
+    //             if !used_task.contains(&index) /*&& (current_tasks_difficulty + task.difficulty) <= data.max_complexity_per_member */{
+    //                 break;
+    //             }
                 
-                index = rng.gen_range(0..data.number_of_task);
-            }
-            println!("{task:?}");
+    //             index = rng.gen_range(0..data.number_of_task);
+    //         }
+    //         println!("{task:?}");
             
-            used_task.insert(index);
-            let task = data.tasks.get(index as usize).unwrap();
-            current_tasks_difficulty += task.difficulty;
-            member_current_task.push(task);
-        }
-        println!("{member_current_task:?}");
-        println!("{current_tasks_difficulty:?}");
-    });
+    //         used_task.insert(index);
+    //         let task = data.tasks.get(index as usize).unwrap();
+    //         current_tasks_difficulty += task.difficulty;
+    //         member_current_task.push(task);
+    //     }
+    //     println!("{member_current_task:?}");
+    //     println!("{current_tasks_difficulty:?}");
+    // });
 }
 
 fn get_colletive_information() -> CollectiveInformation {
@@ -163,9 +202,7 @@ fn get_colletive_information() -> CollectiveInformation {
     println!("{:?}", tasks.iter().map(|a| a.difficulty).collect::<Vec<_>>());
 
     let arr = [9, 8, 9, 5, 3, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
-    let target = 20;
-    let n = 3;
-
+    
     // todo, for simplicity, the number should be dividable by 2, 3, 4. 
     // todo. For instance, 48 is a perfect candidate: 12, 16, 24
 
@@ -178,13 +215,3 @@ fn get_colletive_information() -> CollectiveInformation {
         max_complexity_per_member: total_complexity / num_members,
     }
 }
-
-/*
-What algorithm can solve the following problem: 
-Generate a function that randomly generate N subset of the following array
-[9, 8, 9, 5, 3, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1]
-each subset's sum needs to be as close as possible to X
-Each element of the array should only be used once
-Assume know that N divides X without remainder. That means that each subset is a perfect sum to X
-The function should return a vector containing the N subset
-*/
