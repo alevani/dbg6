@@ -1,12 +1,28 @@
-use crate::dbgg_resources::{Area, Group};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 
-pub static max_complexity_per_member: i32 = 12;
-pub static total_complexity: i32 = 48;
-pub static nmembers: i32 = 4;
+#[derive(Debug)]
+pub enum Area {
+    Kitchen,
+    Bathroom,
+    LivingRoom,
+    Entrance,
+    Outdoor,
+    Everywhere,
+}
 
-pub static GROUPPED_TASK: Lazy<HashMap<i32, Vec<(Area, &'static str, Group)>>> = Lazy::new(|| {
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub enum Group {
+    Bathroom,
+    Trashs,
+    WipeKitchen,
+    Vacuum,
+    Outdoor,
+    Other,
+    Default,
+}
+
+pub fn GROUPPED_TASK() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
     let mut m = HashMap::new();
     m.insert(
         1,
@@ -70,76 +86,75 @@ pub static GROUPPED_TASK: Lazy<HashMap<i32, Vec<(Area, &'static str, Group)>>> =
         ],
     );
     m
-});
+}
 
-pub static SUBTASKS_PER_GROUPPED_TASKS: Lazy<HashMap<Group, Vec<(Area, &'static str, Group)>>> =
-    Lazy::new(|| {
-        let mut m = HashMap::new();
-        m.insert(
-            Group::Bathroom,
-            vec![
-                (Area::Bathroom, "Clean mirror", Group::Default),
-                (Area::Bathroom, "Clean sink + tap", Group::Default),
-                (
-                    Area::Bathroom,
-                    "Clean shower (Floor - Shower head)",
-                    Group::Default,
-                ),
-                (Area::Bathroom, "Wipe all surfaces", Group::Default),
-                (Area::Bathroom, "Clean toilet", Group::Default),
-            ],
-        );
-        m.insert(
-            Group::Trashs,
-            vec![
-                (Area::Bathroom, "Empty trash bin", Group::Default),
-                (
-                    Area::Kitchen,
-                    "Empty Trash + Bio Trash + clean bio bin",
-                    Group::Default,
-                ),
-                (
-                    Area::Kitchen,
-                    "Empty Recycling + clean bins",
-                    Group::Default,
-                ),
-                (Area::Kitchen, "Clean under sink", Group::Default),
-            ],
-        );
-        m.insert(
-            Group::Vacuum,
-            vec![
-                (Area::Bathroom, "Vacuum floor + wash", Group::Default),
-                (Area::Kitchen, "Vacuum floor + wash", Group::Default),
-                (Area::LivingRoom, "Vacuum sofa and chair", Group::Default),
-                (Area::LivingRoom, "Vacuum floor + wash", Group::Default),
-            ],
-        );
-        m.insert(
-            Group::Outdoor,
-            vec![
-                (Area::Outdoor, "Refund bottles and cans", Group::Default),
-                (
-                    Area::Outdoor,
-                    "Shopping (have a look + shoppinglist)",
-                    Group::Default,
-                ),
-            ],
-        );
-        m.insert(
-            Group::WipeKitchen,
-            vec![
-                (
-                    Area::Kitchen,
-                    "Kitchen counter area: Wipe all surfaces + panels",
-                    Group::Default,
-                ),
-                (
-                    Area::Kitchen,
-                    "Table area: Wipe all surfaces + panels",
-                    Group::Default,
-                ),
-            ],
-        );
-        m
-    });
+pub fn SUBTASKS_PER_GROUPPED_TASKS() -> HashMap<Group, Vec<(Area, &'static str, Group)>> {
+    let mut m = HashMap::new();
+    m.insert(
+        Group::Bathroom,
+        vec![
+            (Area::Bathroom, "Clean mirror", Group::Default),
+            (Area::Bathroom, "Clean sink + tap", Group::Default),
+            (
+                Area::Bathroom,
+                "Clean shower (Floor - Shower head)",
+                Group::Default,
+            ),
+            (Area::Bathroom, "Wipe all surfaces", Group::Default),
+            (Area::Bathroom, "Clean toilet", Group::Default),
+        ],
+    );
+    m.insert(
+        Group::Trashs,
+        vec![
+            (Area::Bathroom, "Empty trash bin", Group::Default),
+            (
+                Area::Kitchen,
+                "Empty Trash + Bio Trash + clean bio bin",
+                Group::Default,
+            ),
+            (
+                Area::Kitchen,
+                "Empty Recycling + clean bins",
+                Group::Default,
+            ),
+            (Area::Kitchen, "Clean under sink", Group::Default),
+        ],
+    );
+    m.insert(
+        Group::Vacuum,
+        vec![
+            (Area::Bathroom, "Vacuum floor + wash", Group::Default),
+            (Area::Kitchen, "Vacuum floor + wash", Group::Default),
+            (Area::LivingRoom, "Vacuum sofa and chair", Group::Default),
+            (Area::LivingRoom, "Vacuum floor + wash", Group::Default),
+        ],
+    );
+    m.insert(
+        Group::Outdoor,
+        vec![
+            (Area::Outdoor, "Refund bottles and cans", Group::Default),
+            (
+                Area::Outdoor,
+                "Shopping (have a look + shoppinglist)",
+                Group::Default,
+            ),
+        ],
+    );
+    m.insert(
+        Group::WipeKitchen,
+        vec![
+            (
+                Area::Kitchen,
+                "Kitchen counter area: Wipe all surfaces + panels",
+                Group::Default,
+            ),
+            (
+                Area::Kitchen,
+                "Table area: Wipe all surfaces + panels",
+                Group::Default,
+            ),
+        ],
+    );
+    m
+}
