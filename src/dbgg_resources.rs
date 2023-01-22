@@ -1,83 +1,37 @@
-use chrono::Local;
-use core::num;
+use chrono::{Local, Datelike, Weekday, Duration};
 use rand::prelude::*;
 use rand_pcg::Pcg64;
 use rand_seeder::Seeder;
-use std::collections::HashSet;
-use std::collections::{hash_map::Entry, HashMap};
-use std::default;
+use std::collections::HashMap;
+use crate::data::{get_groupped_task, Group, subtasks_per_groupped_tasks, Area};
 
-use crate::data::{self, GROUPPED_TASK, SUBTASKS_PER_GROUPPED_TASKS};
-
-#[derive(Debug)]
-pub enum Area {
-    Kitchen,
-    Bathroom,
-    LivingRoom,
-    Entrance,
-    Outdoor,
-    Everywhere,
-}
-
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub enum Group {
-    Bathroom,
-    Trashs,
-    WipeKitchen,
-    Vacuum,
-    Outdoor,
-    Other,
-    Default,
-}
-
-pub fn a() {
+pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<Vec<(crate::data::Area, &'static str, Group)>> {
     //vec!["Vanini", "Gamerdinger", "Henriette", "Jon"]
-    /*
-        Since the DP subset like algorithm we use for the
-        division of labor is only dealing with an array of number
-        and has no notion of the link between the numbers and the
-        task it came from, here is how we will go about thing.
+    let division_of_labor: Vec<Vec<i32>> = generate_subsets(number_of_subset, subset_sum_target);
+    let mut groupped_task: HashMap<i32, Vec<(Area, &'static str, Group)>> = get_groupped_task();
+    let mut subtasks_per_groupped_tasks: HashMap<Group, Vec<(Area, &'static str, Group)>> = subtasks_per_groupped_tasks();
 
-        Each week, we calculate the current seed for the RND based
-        on YYYY/MM/WW (if monday, day - 1).
-        We then shuffle the list of number, and calculate the subsets.
 
-        The one thing that never gets shuffled is the HashMap of tasks
-        T = HashMap<difficulty: i32, Vec<tasks>>.
-
-        With the new subsets, we can then map each number to an item
-        of the hashmap, just taking the first one in the stack.
-
-        subset1.map(|s| T.remove(s) (<- make sure to remove from stack if occupied))
-
-        Then, we attribute to a random member the subset, still based on the weekly
-        RNG.
-
-        This way, we keep the distribution always random.
-    */
-    // let mut used_task_per_group: HashMap<i32, i32> = HashMap::new();
-    // let division_of_labor = get_tasks_for_member();
-
-    // for subset in division_of_labor {
-    //     let mut s = Vec::new();
-    //     for difficulty in subset {
-    //         let index = used_task_per_group.get(&difficulty).unwrap_or(&0).to_owned();
-    //         let task = GROUPPED_TASK.get(&difficulty).unwrap()[index as usize];
-    //         used_task_per_group.insert(difficulty, index + 1);
-
-    //         if task.2 != Group::Other {
-    //             s.push(SUBTASKS_PER_GROUPPED_TASKS.get(&task.2).unwrap());
-
-    //         } else {
-    //             let t = vec![task];
-    //             s.push(&t);
-
-    //         }
-    //     }
-    // }
+    let mut tasks: Vec<Vec<(Area, &'static str, Group)>> = Vec::new();
+    for subset in division_of_labor {
+        for diff in subset {
+            let task = groupped_task.get_mut(&diff).unwrap().pop().unwrap();
+            if task.2 != Group::Other {
+                let t = subtasks_per_groupped_tasks.remove(&task.2).unwrap();
+                tasks.push(t);
+            } else {
+                tasks.push(vec![task]);
+                
+            }
+        }
+    }
+    // todo how to handle when we remove a participant for the week?
+    // let participants = vec!["Vanini", "Gamerdinger", "Henriette", "Jon"];
+    
+    tasks
 }
 
-pub fn get_tasks_for_member(number_of_subset: usize) -> Vec<Vec<i32>> {
+pub fn generate_subsets(number_of_subset: usize, subset_sum_target: i32) -> Vec<Vec<i32>> {
     /*
     Assumption for this simple algorithm to always work:
     - The total sum must be A (48 in our case)
@@ -99,11 +53,17 @@ pub fn get_tasks_for_member(number_of_subset: usize) -> Vec<Vec<i32>> {
     */
 
     // - Setup RNG
-    let date = Local::now().date_naive();
-    // todo Handle that Monday should be considered Sunday
+    let mut date = Local::now().date_naive();
+    
+    // Will display the same list for Monday as well
+    // As some of us like to clean there.
+    if date.weekday() == Weekday::Mon {
+        date =  Local::now().date_naive() - Duration::days(1);
+    }
+
     let date_string = date.format("%Y/%m/%U").to_string();
     let mut rng_try = 0;
-    
+
     // Shlag solution:
     // since the algorithm is sub-optimal, everytime a solution does not
     // work, we increment the seed, until it does ;).
@@ -111,7 +71,7 @@ pub fn get_tasks_for_member(number_of_subset: usize) -> Vec<Vec<i32>> {
     loop {
         rng_try += 1;
         let mut rng: Pcg64 = Seeder::from(format!("{date_string}{rng_try}")).make_rng();
-        
+
         // - Setup  Data holders
         let mut v: Vec<Vec<i32>> = vec![vec![]; number_of_subset];
 
@@ -127,16 +87,15 @@ pub fn get_tasks_for_member(number_of_subset: usize) -> Vec<Vec<i32>> {
             let mut index = 0 as usize;
 
             loop {
-                // todo replace 12 by target
-                if v_d[index] + value <= 12 {
+                if v_d[index] + value <= subset_sum_target {
                     v_d[index] = v_d[index] + value;
                     v[index as usize].push(value);
                     break;
                 }
 
-                index += 1; // will never exceed (Max number of participant - 1)
-                            // As per the assumptions
-                if index > 3 {
+                index += 1;
+
+                if index > number_of_subset - 1 {
                     break 'inner;
                 }
             }
@@ -146,38 +105,4 @@ pub fn get_tasks_for_member(number_of_subset: usize) -> Vec<Vec<i32>> {
             }
         }
     }
-
-    // data.members.into_iter().for_each(|member| {
-
-    //     //todo does not need to be a new random gen for each, one per week is enough
-
-    //     let mut index = rng.gen_range(0..data.number_of_task);
-    //     let mut current_tasks_difficulty = 0;
-    //     let mut member_current_task: Vec<&Task> = Vec::new();
-    //     let mut task: &Task;
-
-    //     //? To begin with, you can probably do a simple backtracking.
-    //     //? You add the element, when it doesn't work for someone else, backtrack
-    //     //? though that might be a problem because I use a fixed seed for the generator
-    //     println!("----{}---", member.name);
-    //     while current_tasks_difficulty < data.max_complexity_per_member {
-    //         loop {
-
-    //             task = data.tasks.get(index as usize).unwrap();
-    //             if !used_task.contains(&index) /*&& (current_tasks_difficulty + task.difficulty) <= data.max_complexity_per_member */{
-    //                 break;
-    //             }
-
-    //             index = rng.gen_range(0..data.number_of_task);
-    //         }
-    //         println!("{task:?}");
-
-    //         used_task.insert(index);
-    //         let task = data.tasks.get(index as usize).unwrap();
-    //         current_tasks_difficulty += task.difficulty;
-    //         member_current_task.push(task);
-    //     }
-    //     println!("{member_current_task:?}");
-    //     println!("{current_tasks_difficulty:?}");
-    // });
 }

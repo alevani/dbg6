@@ -22,7 +22,7 @@ pub enum Group {
     Default,
 }
 
-pub fn GROUPPED_TASK() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
+pub fn get_groupped_task() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
     let mut m = HashMap::new();
     m.insert(
         1,
@@ -88,7 +88,7 @@ pub fn GROUPPED_TASK() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
     m
 }
 
-pub fn SUBTASKS_PER_GROUPPED_TASKS() -> HashMap<Group, Vec<(Area, &'static str, Group)>> {
+pub fn subtasks_per_groupped_tasks() -> HashMap<Group, Vec<(Area, &'static str, Group)>> {
     let mut m = HashMap::new();
     m.insert(
         Group::Bathroom,
