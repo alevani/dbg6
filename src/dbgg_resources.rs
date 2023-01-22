@@ -57,20 +57,24 @@ pub fn a() {
     */
     let mut used_task_per_group: HashMap<i32, i32> = HashMap::new();
     let division_of_labor = get_tasks_for_member();
-    division_of_labor.into_iter().map(|subset| {
-        subset.into_iter().map(|difficulty| {
-            let index = *used_task_per_group.get(&difficulty).unwrap_or(&0);
-            let task = &GROUPPED_TASK.get(&difficulty).unwrap()[index as usize];
-            
+
+    for subset in division_of_labor {
+        let mut s = Vec::new();
+        for difficulty in subset {
+            let index = used_task_per_group.get(&difficulty).unwrap_or(&0).to_owned();
+            let task = GROUPPED_TASK.get(&difficulty).unwrap()[index as usize];
             used_task_per_group.insert(difficulty, index + 1);
 
             if task.2 != Group::Other {
-                SUBTASKS_PER_GROUPPED_TASKS.get(&task.2).unwrap()
+                s.push(SUBTASKS_PER_GROUPPED_TASKS.get(&task.2).unwrap());
+                
             } else {
-                &vec![*task]
+                let t = vec![task];
+                s.push(&t);
+                
             }
-        });
-    });
+        }
+    }
 }
 
 // unsure yet how to store that
