@@ -4,19 +4,40 @@ pub mod data;
 pub mod dbgg_resources;
 
 use yew::prelude::*;
-use yew_template::template_html;
+
+pub struct TaskView {
+    pub holder: String,
+    pub task_section: Vec<TaskSection>,
+}
+
+pub struct TaskSection {
+    pub name: String,
+    pub tasks: Vec<String>,
+}
+
 
 #[function_component(App)]
 fn app() -> Html {
-    let tasks_per_person = get_tasks(3, 16);
+    let task_views = get_tasks(4, 12);
 
-    let tasks_html = tasks_per_person.iter().map(|tasks| {
-        let ht = tasks.1.iter().map(|task| html! {
-            <p>{format!("{}: {}", task.0, task.1)}</p>
+    let tasks_html = task_views.iter().map(|task_view| {
+        
+        let ht = task_view.task_section.iter().map(|sections| {
+            let inner_ht = sections.tasks.iter().map(|t_name| html! {
+                <p>{t_name}</p>
+            }).collect::<Html>();
+
+            html! {
+                <>
+                    <h3>{format!("{}", sections.name)}</h3>
+                    { inner_ht }
+                </>
+            }
         }).collect::<Html>();
+
         html! {
             <>
-                <h2>{format!("{}", tasks.0)}</h2>
+                <h2>{format!("{}", task_view.holder)}</h2>
                 { ht }
             </>
         }

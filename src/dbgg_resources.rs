@@ -2,36 +2,77 @@ use chrono::{Local, Datelike, Weekday, Duration};
 use rand::prelude::*;
 use rand_pcg::Pcg64;
 use rand_seeder::Seeder;
-use std::collections::HashMap;
-use crate::data::{get_groupped_task, Group, subtasks_per_groupped_tasks, Area};
+use std::collections::{HashMap, hash_map::Entry};
+use crate::{data::{get_groupped_task, Group, subtasks_per_groupped_tasks, Area}, TaskView, TaskSection};
 
-pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<(&'static str, Vec<(crate::data::Area, &'static str, Group)>)> {
-    //vec!["Vanini", "Gamerdinger", "Henriette", "Jon"]
+pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<TaskView> {
     let division_of_labor: Vec<Vec<i32>> = generate_subsets(number_of_subset, subset_sum_target);
     let mut groupped_task: HashMap<i32, Vec<(Area, &'static str, Group)>> = get_groupped_task();
     let mut subtasks_per_groupped_tasks: HashMap<Group, Vec<(Area, &'static str, Group)>> = subtasks_per_groupped_tasks();
 
 
-    let mut tasks: Vec<Vec<Vec<(Area, &'static str, Group)>>> = Vec::new();
+    let mut tasks: Vec<HashMap<Area, Vec<String>>> = Vec::new();
     for subset in division_of_labor {
-        let mut current_subset_mapping: Vec<Vec<(Area, &'static str, Group)>> = Vec::new();
+        let mut current_subset_hmapping: HashMap<Area, Vec<String>> = HashMap::new();
+        
         for diff in subset {
             let task = groupped_task.get_mut(&diff).unwrap().pop().unwrap();
-            if task.2 != Group::Other {
-                let t = subtasks_per_groupped_tasks.remove(&task.2).unwrap();
-                current_subset_mapping.push(t);
+            
+            for element in if task.2 != Group::Other {
+                subtasks_per_groupped_tasks.remove(&task.2).unwrap()
             } else {
-                current_subset_mapping.push(vec![task]);
+                vec![task]
+            } {
                 
+                match current_subset_hmapping.entry(element.0) {
+                    Entry::Vacant(e) => {
+                        e.insert(vec![element.1.to_string()]);
+                    }
+                    Entry::Occupied(mut e) => {
+                        e.get_mut().push(element.1.to_string());
+                    }
+                };
             }
         }
-        tasks.push(current_subset_mapping);
+        tasks.push(current_subset_hmapping);
     }
-    
+
     // todo how to handle when we remove a participant for the week?
     let participants = vec!["Vanini", "Gamerdinger", "Henriette", "Jon"];
+
+    tasks.iter().enumerate().map(|(i, person)| {
+        let sections = person.iter().map(|(k, v)| {
+            TaskSection {
+                name: k.to_string(),
+                tasks: v.to_owned()
+            }
+        }).collect();
+        
+        TaskView {
+            holder: participants[i].to_string(),
+            task_section: sections
+        }
+    }).collect()
+
+    // tasks.into_iter().enumerate().map(|(i, t)| {
+    //     let task_sections = t.into_iter().map(|vec_t| {
+    //         let (name, descs): (Vec<Area>, Vec<String>) = vec_t.into_iter().map(|tripple| {
+    //             (tripple.0, tripple.1.to_string())
+    //         }).unzip();
+            
+    //         TaskSection {
+    //             name: name[0].to_string(),
+    //             tasks: descs
+    //         }
+    //     }).collect();
+        
+    //     TaskView {
+    //         holder: participants[i].to_string(),
+    //         task_section: task_sections,
+    //     }
+    // }).collect()
     
-    tasks.into_iter().enumerate().map(|(i, s)| (participants[i], s.into_iter().flatten().collect())).collect()
+    // tasks.into_iter().enumerate().map(|(i, s)| (participants[i], s.into_iter().flatten().collect())).collect()
 }
 
 pub fn generate_subsets(number_of_subset: usize, subset_sum_target: i32) -> Vec<Vec<i32>> {

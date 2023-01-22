@@ -1,7 +1,7 @@
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 pub enum Area {
     Kitchen,
     Bathroom,
@@ -26,6 +26,12 @@ pub enum Group {
     Outdoor,
     Other,
     Default,
+}
+
+impl std::fmt::Display for Group {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 pub fn get_groupped_task() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
