@@ -3,9 +3,16 @@ use dbgg_resources::get_tasks;
 pub mod data;
 pub mod dbgg_resources;
 
+use gloo_console::{externs::info, info, log};
 use yew::prelude::*;
 
-pub struct TaskView {
+#[derive(Properties, PartialEq)]
+pub struct TaskViewProp {
+    pub holder: String,
+    on_click: Callback<String>,
+}
+
+pub struct TaskData {
     pub holder: String,
     pub task_section: Vec<TaskSection>,
 }
@@ -15,16 +22,26 @@ pub struct TaskSection {
     pub tasks: Vec<String>,
 }
 
+#[derive(Clone, PartialEq, Properties)]
+struct Props {
+    number_of_participant: i32,
+    task_target: i32,
+}
 
-#[function_component(App)]
-fn app() -> Html {
-    let task_views = get_tasks(4, 12);
+fn callback() {
+    info!("items");
+    yew::Renderer::<App>::new().render();
+}
 
-    let tasks_html = task_views.iter().map(|task_view| {
+#[function_component]
+fn TaskView(props: &Props) -> Html {
+    let task_datas = get_tasks(props.number_of_participant as usize, props.task_target);
+
+    task_datas.iter().map(|task_data| {
         
-        let ht = task_view.task_section.iter().map(|sections| {
+        let ht = task_data.task_section.iter().map(|sections| {
             let inner_ht = sections.tasks.iter().map(|t_name| html! {
-                <p>{t_name}</p>
+                <p> {format!("- {t_name}")}</p>
             }).collect::<Html>();
 
             html! {
@@ -37,20 +54,22 @@ fn app() -> Html {
 
         html! {
             <>
-                <h2>{format!("{}", task_view.holder)}</h2>
+                <h2 onclick={Callback::from(|_| callback())}>{format!("{}", task_data.holder)}</h2>
                 <div class="content">
                     { ht }
                 </div>
             </>
         }
-    }).collect::<Html>();
+    }).collect::<Html>()
+}
 
-
+#[function_component(App)]
+fn app() -> Html {
     html! {
         <>
             <h1>{ "DBG6 Cleaning!"}</h1>
             <div>
-                { tasks_html }
+                <TaskView number_of_participant=4 task_target=12/>
             </div>
         </>
     }
