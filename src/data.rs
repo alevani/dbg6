@@ -80,7 +80,11 @@ pub static SUBTASKS_PER_GROUPPED_TASKS: Lazy<HashMap<Group, Vec<(Area, &'static 
             vec![
                 (Area::Bathroom, "Clean mirror", Group::Default),
                 (Area::Bathroom, "Clean sink + tap", Group::Default),
-                (Area::Bathroom, "Clean shower (Floor - Shower head)", Group::Default),
+                (
+                    Area::Bathroom,
+                    "Clean shower (Floor - Shower head)",
+                    Group::Default,
+                ),
                 (Area::Bathroom, "Wipe all surfaces", Group::Default),
                 (Area::Bathroom, "Clean toilet", Group::Default),
             ],
@@ -89,8 +93,16 @@ pub static SUBTASKS_PER_GROUPPED_TASKS: Lazy<HashMap<Group, Vec<(Area, &'static 
             Group::Trashs,
             vec![
                 (Area::Bathroom, "Empty trash bin", Group::Default),
-                (Area::Kitchen, "Empty Trash + Bio Trash + clean bio bin", Group::Default),
-                (Area::Kitchen, "Empty Recycling + clean bins", Group::Default),
+                (
+                    Area::Kitchen,
+                    "Empty Trash + Bio Trash + clean bio bin",
+                    Group::Default,
+                ),
+                (
+                    Area::Kitchen,
+                    "Empty Recycling + clean bins",
+                    Group::Default,
+                ),
                 (Area::Kitchen, "Clean under sink", Group::Default),
             ],
         );
@@ -107,7 +119,11 @@ pub static SUBTASKS_PER_GROUPPED_TASKS: Lazy<HashMap<Group, Vec<(Area, &'static 
             Group::Outdoor,
             vec![
                 (Area::Outdoor, "Refund bottles and cans", Group::Default),
-                (Area::Outdoor, "Shopping (have a look + shoppinglist)", Group::Default),
+                (
+                    Area::Outdoor,
+                    "Shopping (have a look + shoppinglist)",
+                    Group::Default,
+                ),
             ],
         );
         m.insert(
@@ -118,7 +134,11 @@ pub static SUBTASKS_PER_GROUPPED_TASKS: Lazy<HashMap<Group, Vec<(Area, &'static 
                     "Kitchen counter area: Wipe all surfaces + panels",
                     Group::Default,
                 ),
-                (Area::Kitchen, "Table area: Wipe all surfaces + panels", Group::Default),
+                (
+                    Area::Kitchen,
+                    "Table area: Wipe all surfaces + panels",
+                    Group::Default,
+                ),
             ],
         );
         m
