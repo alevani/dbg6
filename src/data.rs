@@ -11,6 +11,12 @@ pub enum Area {
     Everywhere,
 }
 
+impl std::fmt::Display for Area {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub enum Group {
     Bathroom,

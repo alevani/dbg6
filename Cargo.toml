@@ -1,5 +1,5 @@
 [package]
-name = "dbgg"
+name = "dbg6"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,3 +11,9 @@ rand = "0.8"
 rand_pcg = "0.3"
 chrono = "0.4"
 once_cell = "1.17.0"
+yew = { version = "0.20", features = ["csr"] }
+yew-template = "0.8.1"
+getrandom = { version = "0.2", features = ["js"] }
+
+#gloo-net = "0.2"
+#wasm-bindgen-futures = "0.4"
