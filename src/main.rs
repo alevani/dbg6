@@ -8,7 +8,7 @@ use yew_template::template_html;
 
 #[function_component(App)]
 fn app() -> Html {
-    let tasks_per_person = get_tasks(4, 12);
+    let tasks_per_person = get_tasks(3, 16);
 
     let tasks_html = tasks_per_person.iter().map(|tasks| {
         let ht = tasks.1.iter().map(|task| html! {
@@ -16,7 +16,7 @@ fn app() -> Html {
         }).collect::<Html>();
         html! {
             <>
-                <h1>{format!("{}", tasks.0)}</h1>
+                <h2>{format!("{}", tasks.0)}</h2>
                 { ht }
             </>
         }
@@ -27,7 +27,6 @@ fn app() -> Html {
         <>
             <h1>{ "DBG6 Cleaning!"}</h1>
             <div>
-                <h3>{"Task for {todo name}"}</h3>
                 { tasks_html }
             </div>
         </>
