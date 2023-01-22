@@ -12,23 +12,25 @@ pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<Vec<(cr
     let mut subtasks_per_groupped_tasks: HashMap<Group, Vec<(Area, &'static str, Group)>> = subtasks_per_groupped_tasks();
 
 
-    let mut tasks: Vec<Vec<(Area, &'static str, Group)>> = Vec::new();
+    let mut tasks: Vec<Vec<Vec<(Area, &'static str, Group)>>> = Vec::new();
     for subset in division_of_labor {
+        let mut current_subset_mapping: Vec<Vec<(Area, &'static str, Group)>> = Vec::new();
         for diff in subset {
             let task = groupped_task.get_mut(&diff).unwrap().pop().unwrap();
             if task.2 != Group::Other {
                 let t = subtasks_per_groupped_tasks.remove(&task.2).unwrap();
-                tasks.push(t);
+                current_subset_mapping.push(t);
             } else {
-                tasks.push(vec![task]);
+                current_subset_mapping.push(vec![task]);
                 
             }
         }
+        tasks.push(current_subset_mapping);
     }
     // todo how to handle when we remove a participant for the week?
     // let participants = vec!["Vanini", "Gamerdinger", "Henriette", "Jon"];
     
-    tasks
+    tasks.into_iter().map(|s| s.into_iter().flatten().collect()).collect()
 }
 
 pub fn generate_subsets(number_of_subset: usize, subset_sum_target: i32) -> Vec<Vec<i32>> {
