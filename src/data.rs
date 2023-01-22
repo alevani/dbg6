@@ -7,7 +7,7 @@ pub enum Area {
     Bathroom,
     LivingRoom,
     Entrance,
-    Outdoor,
+    Outside,
     Everywhere,
 }
 
@@ -23,7 +23,7 @@ pub enum Group {
     Trashs,
     WipeKitchen,
     Vacuum,
-    Outdoor,
+    Outside,
     Other,
     Default,
 }
@@ -85,7 +85,7 @@ pub fn get_groupped_task() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
         3,
         vec![(Area::Kitchen, "Wipe kitchen tasks", Group::WipeKitchen)],
     );
-    m.insert(5, vec![(Area::Outdoor, "Outdoor tasks", Group::Outdoor)]);
+    m.insert(5, vec![(Area::Outside, "Outside tasks", Group::Outside)]);
     m.insert(
         8,
         vec![(Area::Kitchen, "Trash related tasks", Group::Trashs)],
@@ -143,11 +143,11 @@ pub fn subtasks_per_groupped_tasks() -> HashMap<Group, Vec<(Area, &'static str, 
         ],
     );
     m.insert(
-        Group::Outdoor,
+        Group::Outside,
         vec![
-            (Area::Outdoor, "Refund bottles and cans", Group::Default),
+            (Area::Outside, "Refund bottles and cans", Group::Default),
             (
-                Area::Outdoor,
+                Area::Outside,
                 "Shopping (have a look + shoppinglist)",
                 Group::Default,
             ),

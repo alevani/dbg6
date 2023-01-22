@@ -38,7 +38,9 @@ fn app() -> Html {
         html! {
             <>
                 <h2>{format!("{}", task_view.holder)}</h2>
-                { ht }
+                <div class="content">
+                    { ht }
+                </div>
             </>
         }
     }).collect::<Html>();
