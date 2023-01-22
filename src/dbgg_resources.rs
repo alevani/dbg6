@@ -5,7 +5,7 @@ use rand_seeder::Seeder;
 use std::collections::HashMap;
 use crate::data::{get_groupped_task, Group, subtasks_per_groupped_tasks, Area};
 
-pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<Vec<(crate::data::Area, &'static str, Group)>> {
+pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<(&'static str, Vec<(crate::data::Area, &'static str, Group)>)> {
     //vec!["Vanini", "Gamerdinger", "Henriette", "Jon"]
     let division_of_labor: Vec<Vec<i32>> = generate_subsets(number_of_subset, subset_sum_target);
     let mut groupped_task: HashMap<i32, Vec<(Area, &'static str, Group)>> = get_groupped_task();
@@ -27,10 +27,11 @@ pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<Vec<(cr
         }
         tasks.push(current_subset_mapping);
     }
-    // todo how to handle when we remove a participant for the week?
-    // let participants = vec!["Vanini", "Gamerdinger", "Henriette", "Jon"];
     
-    tasks.into_iter().map(|s| s.into_iter().flatten().collect()).collect()
+    // todo how to handle when we remove a participant for the week?
+    let participants = vec!["Vanini", "Gamerdinger", "Henriette", "Jon"];
+    
+    tasks.into_iter().enumerate().map(|(i, s)| (participants[i], s.into_iter().flatten().collect())).collect()
 }
 
 pub fn generate_subsets(number_of_subset: usize, subset_sum_target: i32) -> Vec<Vec<i32>> {
