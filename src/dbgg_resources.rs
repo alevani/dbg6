@@ -23,6 +23,8 @@ pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<TaskDat
 
         for diff in subset {
             let task_list = groupped_task.get_mut(&diff).unwrap();
+            
+            // We select randomly, otherwise if A get a 1, it's always the same task
             let task = task_list.remove(rng.gen_range(0..task_list.len()));
 
             for element in if task.2 != Group::Other {
@@ -30,9 +32,6 @@ pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<TaskDat
             } else {
                 vec![task]
             } {
-                //todo maybe I will have to do that randomly too
-                //todo WE SHOULD!!! otherwise if A as a 1, it will always
-                //todo be this one
                 match current_subset_hmapping.entry(element.0) {
                     Entry::Vacant(e) => {
                         e.insert(vec![element.1.to_string()]);
