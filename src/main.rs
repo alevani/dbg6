@@ -48,7 +48,7 @@ fn TaskView(props: &Props) -> Html {
         html! {
             <>
                 <div class="border">
-                    <h2 onclick={Callback::from(|_| callback())}>{format!("{}", task_data.holder)}</h2>
+                    <h2>{format!("{}", task_data.holder)}</h2>
                     <div class="content">
                         { ht }
                     </div>
