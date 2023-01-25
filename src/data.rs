@@ -45,7 +45,7 @@ pub fn get_groupped_task() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
             (Area::Kitchen, "Clean micro", Group::Other),
             (
                 Area::Kitchen,
-                "Clean the 3 vases (cloths and dish brush + onion + pot spoon, palette knife ect)",
+                "Clean the 3 vases",
                 Group::Other,
             ),
             (
@@ -55,7 +55,7 @@ pub fn get_groupped_task() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
             ),
             (
                 Area::Kitchen,
-                "Wash towels + Cloths (90 degrees)",
+                "Wash towels and cloths",
                 Group::Other,
             ),
             (
@@ -148,7 +148,7 @@ pub fn subtasks_per_groupped_tasks() -> HashMap<Group, Vec<(Area, &'static str, 
             (Area::Outside, "Refund bottles and cans", Group::Default),
             (
                 Area::Outside,
-                "Shopping (have a look + shoppinglist)",
+                "Common shopping",
                 Group::Default,
             ),
         ],

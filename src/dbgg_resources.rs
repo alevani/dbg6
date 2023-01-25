@@ -3,6 +3,7 @@ use crate::{
     TaskData, TaskSection,
 };
 use chrono::{Datelike, Duration, Local, Weekday};
+use gloo_console::info;
 use rand::prelude::*;
 use rand_pcg::Pcg64;
 use rand_seeder::Seeder;
@@ -22,10 +23,12 @@ pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<TaskDat
             let task = groupped_task.get_mut(&diff).unwrap().pop().unwrap();
 
             for element in if task.2 != Group::Other {
+                //todo maybe I will have to do that randomly too
                 subtasks_per_groupped_tasks.remove(&task.2).unwrap()
             } else {
                 vec![task]
             } {
+                //todo maybe I will have to do that randomly too
                 match current_subset_hmapping.entry(element.0) {
                     Entry::Vacant(e) => {
                         e.insert(vec![element.1.to_string()]);
@@ -40,7 +43,7 @@ pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32) -> Vec<TaskDat
     }
 
     // todo how to handle when we remove a participant for the week?
-    let participants = vec!["Mr. Vanini", "Mr. Gamerdinger", "Henriette", "Jon"];
+    let participants = vec!["G. Alexander", "V. Alexandre", "Henriette", "Jon"];
 
     tasks
         .iter()
@@ -101,8 +104,10 @@ pub fn generate_subsets(number_of_subset: usize, subset_sum_target: i32) -> Vec<
     // Suboptimal, but ok as we work with small arrays
     loop {
         rng_try += 1;
+        // todo the seed don't change the random enough
+        // todo probably need to hash it first.
         let mut rng: Pcg64 = Seeder::from(format!("{date_string}{rng_try}")).make_rng();
-
+        
         // - Setup  Data holders
         let mut v: Vec<Vec<i32>> = vec![vec![]; number_of_subset];
 

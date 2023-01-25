@@ -6,12 +6,6 @@ pub mod dbgg_resources;
 use gloo_console::{externs::info, info, log};
 use yew::prelude::*;
 
-#[derive(Properties, PartialEq)]
-pub struct TaskViewProp {
-    pub holder: String,
-    on_click: Callback<String>,
-}
-
 pub struct TaskData {
     pub holder: String,
     pub task_section: Vec<TaskSection>,
@@ -29,7 +23,6 @@ struct Props {
 }
 
 fn callback() {
-    info!("items");
     yew::Renderer::<App>::new().render();
 }
 
@@ -41,7 +34,7 @@ fn TaskView(props: &Props) -> Html {
         
         let ht = task_data.task_section.iter().map(|sections| {
             let inner_ht = sections.tasks.iter().map(|t_name| html! {
-                <p> {format!("- {t_name}")}</p>
+                <p> {format!("• {t_name}")}</p>
             }).collect::<Html>();
 
             html! {
@@ -54,9 +47,11 @@ fn TaskView(props: &Props) -> Html {
 
         html! {
             <>
-                <h2 onclick={Callback::from(|_| callback())}>{format!("{}", task_data.holder)}</h2>
-                <div class="content">
-                    { ht }
+                <div class="border">
+                    <h2 onclick={Callback::from(|_| callback())}>{format!("{}", task_data.holder)}</h2>
+                    <div class="content">
+                        { ht }
+                    </div>
                 </div>
             </>
         }
@@ -67,7 +62,7 @@ fn TaskView(props: &Props) -> Html {
 fn app() -> Html {
     html! {
         <>
-            <h1>{ "DBG6 Cleaning!"}</h1>
+            <h1>{ "DBG6 CLEANING"}</h1>
             <div>
                 <TaskView number_of_participant=4 task_target=12/>
             </div>
