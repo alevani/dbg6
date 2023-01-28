@@ -6,7 +6,7 @@ pub mod dbgg_resources;
 use yew::prelude::*;
 
 pub struct TaskData {
-    pub holder: String,
+    pub holder: &'static str,
     pub task_section: Vec<TaskSection>,
 }
 
@@ -15,24 +15,39 @@ pub struct TaskSection {
     pub tasks: Vec<String>,
 }
 
-#[derive(Clone, PartialEq, Properties)]
-struct Props {
-    number_of_participant: i32,
-    task_target: i32,
+struct TaskView {
+    participants: Vec<&'static str>,
+    link: ComponentLink<Self>,
 }
 
-struct TaskView {}
+pub enum Msg {
+    Remove(&'static str),
+    Add(&'static str),
+}
 
 impl Component for TaskView {
-    type Message = ();
+    type Message = Msg;
     type Properties = ();
 
-    fn create(_props: Self::Properties, _link: ComponentLink<Self>) -> Self {
-        Self {}
+    fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        Self {
+            participants: vec!["G. Alexander", "V. Alexandre", "Henriette", "Jon"],
+            link
+        }
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        false
+    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        match msg {
+            Msg::Add(person) => {
+                self.participants.push(person);
+                self.participants.sort();
+            },
+            Msg::Remove(person) => {
+                let index = self.participants.iter().position(|x| *x == person).unwrap();
+                self.participants.remove(index);
+            },
+        } 
+        true
     }
 
     fn change(&mut self, _props: Self::Properties) -> ShouldRender {
@@ -40,9 +55,11 @@ impl Component for TaskView {
     }
 
     fn view(&self) -> Html {
-        let task_datas = get_tasks(4_usize, 12);
+        let nb_participants = self.participants.len();
+        let target = 48 / nb_participants;
+        let task_datas = get_tasks(nb_participants, target as i32, &self.participants);
 
-        task_datas.iter().map(|task_data| {
+        task_datas.into_iter().map(|task_data| {
             
             let ht = task_data.task_section.iter().map(|sections| {
                 let inner_ht = sections.tasks.iter().map(|t_name| html! {
@@ -60,7 +77,7 @@ impl Component for TaskView {
             html! {
                 <>
                     <div class="border">
-                        <h2>{format!("{}", task_data.holder)}</h2>
+                        <h2 onclick=self.link.callback(move |_| Msg::Remove(task_data.holder))>{format!("{}", task_data.holder)}</h2>
                         <div class="content">
                             { ht }
                         </div>
