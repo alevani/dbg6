@@ -172,10 +172,10 @@ dependencies = [
  "chrono",
  "getrandom",
  "gloo-console",
- "once_cell",
  "rand",
  "rand_pcg",
  "rand_seeder",
+ "serde_json",
  "yew",
 ]
 

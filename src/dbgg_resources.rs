@@ -8,7 +8,7 @@ use rand_pcg::Pcg64;
 use rand_seeder::Seeder;
 use std::collections::{hash_map::Entry, HashMap};
 
-pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32, participants: &Vec<&'static str>) -> Vec<TaskData> {
+pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32, participants: &[&'static str]) -> Vec<TaskData> {
     let (division_of_labor, seed) = generate_subsets(number_of_subset, subset_sum_target);
     let mut groupped_task: HashMap<i32, Vec<(Area, &'static str, Group)>> = get_groupped_task();
     let mut subtasks_per_groupped_tasks: HashMap<Group, Vec<(Area, &'static str, Group)>> =
