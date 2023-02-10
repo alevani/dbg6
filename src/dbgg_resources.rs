@@ -3,22 +3,22 @@ use crate::{
     TaskData, TaskSection,
 };
 use chrono::{Datelike, Duration, Local, Weekday};
+use linked_hash_map::{LinkedHashMap, Entry};
 use rand::prelude::*;
 use rand_pcg::Pcg64;
 use rand_seeder::Seeder;
-use std::collections::{hash_map::Entry, HashMap};
 
 pub fn get_tasks(number_of_subset: usize, subset_sum_target: i32, participants: &[&'static str]) -> Vec<TaskData> {
     let (division_of_labor, seed) = generate_subsets(number_of_subset, subset_sum_target);
-    let mut groupped_task: HashMap<i32, Vec<(Area, &'static str, Group)>> = get_groupped_task();
-    let mut subtasks_per_groupped_tasks: HashMap<Group, Vec<(Area, &'static str, Group)>> =
+    let mut groupped_task: LinkedHashMap<i32, Vec<(Area, &'static str, Group)>> = get_groupped_task();
+    let mut subtasks_per_groupped_tasks: LinkedHashMap<Group, Vec<(Area, &'static str, Group)>> =
         subtasks_per_groupped_tasks();
 
     let mut rng: Pcg64 = Seeder::from(seed).make_rng();
 
-    let mut tasks: Vec<HashMap<Area, Vec<String>>> = Vec::new();
+    let mut tasks: Vec<LinkedHashMap<Area, Vec<String>>> = Vec::new();
     for subset in division_of_labor {
-        let mut current_subset_hmapping: HashMap<Area, Vec<String>> = HashMap::new();
+        let mut current_subset_hmapping: LinkedHashMap<Area, Vec<String>> = LinkedHashMap::new();
 
         for diff in subset {
             let task_list = groupped_task.get_mut(&diff).unwrap();

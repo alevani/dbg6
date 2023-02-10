@@ -172,6 +172,7 @@ dependencies = [
  "chrono",
  "getrandom",
  "gloo-console",
+ "linked-hash-map",
  "rand",
  "rand_pcg",
  "rand_seeder",
@@ -452,6 +453,12 @@ checksum = "ecd207c9c713c34f95a097a5b029ac2ce6010530c7b49d7fea24d977dede04f5"
 dependencies = [
  "cc",
 ]
+
+[[package]]
+name = "linked-hash-map"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0717cef1bc8b636c6e1c1bbdefc09e6322da8a9321966e8928ef80d20f7f770f"
 
 [[package]]
 name = "log"

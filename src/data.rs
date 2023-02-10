@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use linked_hash_map::LinkedHashMap;
+
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub enum Area {
     Kitchen,
@@ -33,8 +35,8 @@ impl std::fmt::Display for Group {
     }
 }
 
-pub fn get_groupped_task() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
-    let mut m = HashMap::new();
+pub fn get_groupped_task() -> LinkedHashMap<i32, Vec<(Area, &'static str, Group)>> {
+    let mut m = LinkedHashMap::new();
     m.insert(
         1,
         vec![
@@ -99,8 +101,8 @@ pub fn get_groupped_task() -> HashMap<i32, Vec<(Area, &'static str, Group)>> {
     m
 }
 
-pub fn subtasks_per_groupped_tasks() -> HashMap<Group, Vec<(Area, &'static str, Group)>> {
-    let mut m = HashMap::new();
+pub fn subtasks_per_groupped_tasks() -> LinkedHashMap<Group, Vec<(Area, &'static str, Group)>> {
+    let mut m = LinkedHashMap::new();
     m.insert(
         Group::Bathroom,
         vec![
